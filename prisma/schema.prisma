@@ -38,15 +38,17 @@ model User {
 }
 
 model Project {
-  id          String       @id @default(uuid())
-  projectName String       @map("project_name")
-  gitUrl      String       @map("git_url")
-  // path        String       @default("")
-  // env         String       @default("")
-  user        User         @relation(fields: [userId], references: [id])
-  userId      String       @default("")
-  createdAt   DateTime     @default(now())
-  Deployment  Deployment[]
+  id             String       @id @default(uuid())
+  projectName    String       @map("project_name")
+  gitUrl         String       @map("git_url")
+  user           User         @relation(fields: [userId], references: [id])
+  userId         String       @default("")
+  createdAt      DateTime     @default(now())
+  Deployment     Deployment[]
+  installCommand String       @default("npm install")
+  buildCommand   String       @default("npm run build")
+  branch         String?
+  env            String       @default("")
 }
 
 model Deployment {
