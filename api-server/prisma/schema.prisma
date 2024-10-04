@@ -49,6 +49,8 @@ model Project {
   buildCommand   String       @default("npm run build")
   branch         String?
   env            String       @default("")
+  lastModified   DateTime     @default(now())
+  lastDeployed   DateTime?
 }
 
 model Deployment {
@@ -58,4 +60,14 @@ model Deployment {
   status    DeploymentStatus @default(NOT_STARTED)
   createdAt DateTime         @default(now())
   projectId String           @default("")
+}
+
+model Request {
+  id          String   @id @default(uuid())
+  projectName String?
+  ipAddress   String?
+  createdAt   DateTime @default(now())
+  country     String?
+
+  @@index([ipAddress, projectName])
 }

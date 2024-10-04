@@ -74,18 +74,18 @@ export const createProject = asyncHandler(
 );
 export const updateProject = asyncHandler(
   async (req: AuthRequest, res: Response) => {
-    const { projectName, buildCommand, installCommand,projectId,branch } =
+    const {  buildCommand, installCommand,projectId,branch } =
       req.body;
     const existingProject = await prismaClient.project.findFirst({
       where: {
-        projectName,
+        id:projectId,
       },
     });
     if (existingProject && existingProject?.id!==projectId) {
       throw new ApiError(409, "Project Name already taken");
     }
     const updatedProject = await prismaClient.project.update({
-      where:{id:projectId},data:{projectName,buildCommand,installCommand,branch}
+      where:{id:projectId},data:{buildCommand,installCommand,branch,lastModified:new Date()}
     })
     res
       .status(200)
@@ -131,6 +131,7 @@ export const deployProject = asyncHandler(
         user: true,
       },
     });
+
     if (!project) throw new ApiError(404, "Project not found");
     const token = project.user.githubAccessToken;
     if (!token) {
@@ -142,7 +143,7 @@ export const deployProject = asyncHandler(
     let latestCommitMessage = "No commit message";
     try {
       const commitResponse = await axios.get(
-        `https://api.github.com/repos/${owner}/${repo}/commits`,
+        `https://api.github.com/repos/${owner}/${repo}/commits?sha=${project.branch}`,
         {
           headers: {
             Authorization: `token ${token}`,
@@ -152,6 +153,7 @@ export const deployProject = asyncHandler(
       latestCommitMessage =
         commitResponse.data[0]?.commit?.message || "No commit message";
     } catch (error: any) {
+
       console.error("Error fetching the latest commit:", error.message);
       throw new ApiError(500, "Error fetching the latest commit message");
     }
@@ -184,9 +186,11 @@ export const deployProject = asyncHandler(
         console.log("Error", err);
       } else {
         console.log("Successfully added message", data.MessageId);
-      }
+    }
     });
-
+    await prismaClient.project.update({
+      where:{id:projectId},data:{lastDeployed:new Date()}
+    })
 
     res.json({
       message: "QUEUED",
