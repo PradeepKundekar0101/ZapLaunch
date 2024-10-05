@@ -51,6 +51,8 @@ model Project {
   env            String       @default("")
   lastModified   DateTime     @default(now())
   lastDeployed   DateTime?
+  isLive         Boolean      @default(false)
+  srcDir         String       @default("/")
 }
 
 model Deployment {

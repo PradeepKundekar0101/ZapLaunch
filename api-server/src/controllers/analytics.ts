@@ -9,80 +9,155 @@ const ipinfo = new IPinfoWrapper(process.env.IPINFO_ACCESS_TOKEN!);
 
 export const getVisitTrends = asyncHandler(async (req: AuthRequest, res) => {
   const projectName = req.params.projectName;
+  const { fromDate, toDate } = req.query;
 
-  const now = new Date();
-  const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-  const startOf7DaysAgo = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 6);
-  const startOfLastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
-  const startOfLastYear = new Date(now.getFullYear() - 1, 0, 1);
+  if (!fromDate || !toDate) {
+    throw new ApiError(
+      400,
+      "fromDate and toDate are required query parameters"
+    );
+  }
 
-  const [overall, lastYear, lastMonth, last7Days, today] = await Promise.all([
-    getVisitCount(projectName),
-    getVisitCount(projectName, startOfLastYear),
-    getVisitCount(projectName, startOfLastMonth),
-    getVisitCount(projectName, startOf7DaysAgo),
-    getVisitCount(projectName, startOfToday),
-  ]);
+  const startDate = new Date(fromDate as string);
+  const endDate = new Date(toDate as string);
 
-  const dailyTrends = await getDailyTrends(projectName, startOf7DaysAgo);
+  if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
+    throw new ApiError(
+      400,
+      "Invalid date format. Please use ISO 8601 format (YYYY-MM-DD)"
+    );
+  }
+
+  // Adjust the endDate to include the entire day
+  endDate.setHours(23, 59, 59, 999);
+
+  const dailyTrends = await getDailyTrends(projectName, startDate, endDate);
+  const totalVisits = dailyTrends.reduce((sum, day) => sum + day.count, 0);
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const todayCount = await getTodayCount(projectName, today);
 
   res.json({
-    overall,
-    lastYear,
-    lastMonth,
-    last7Days,
-    today,
+    todayCount,
+    totalVisits,
     dailyTrends,
+    periodStart: startDate.toISOString(),
+    periodEnd: endDate.toISOString(),
   });
 });
 
-export const getGeographicalDistribution = asyncHandler(async (req: AuthRequest, res) => {
-  const projectName = req.params.projectName;
+async function getTodayCount(projectName: string, today: Date) {
+  const endOfDay = new Date(today);
+  endOfDay.setHours(23, 59, 59, 999);
 
-  const distribution = await prisma.request.groupBy({
-    by: ['country'],
+  const todayVisits = await prisma.request.count({
     where: {
       projectName,
-      country: { not: null },
-    },
-    _count: {
-      country: true,
+      createdAt: {
+        gte: today,
+        lte: endOfDay,
+      },
     },
   });
 
-  const result = distribution.reduce((acc, item) => {
-    acc[item.country!] = item._count.country;
-    return acc;
-  }, {} as Record<string, number>);
-
-  res.json(result);
-});
-
-async function getVisitCount(projectName: string, startDate?: Date) {
-  return prisma.request.count({
-    where: {
-      projectName,
-      ...(startDate && { createdAt: { gte: startDate } }),
-    },
-  });
+  return todayVisits;
 }
 
-async function getDailyTrends(projectName: string, startDate: Date) {
+async function getDailyTrends(
+  projectName: string,
+  startDate: Date,
+  endDate: Date
+) {
   const visits = await prisma.request.groupBy({
-    by: ['createdAt'],
+    by: ["createdAt"],
     where: {
       projectName,
-      createdAt: { gte: startDate },
+      createdAt: {
+        gte: startDate,
+        lte: endDate,
+      },
     },
     _count: {
       id: true,
     },
   });
 
-  return visits.map(visit => ({
-    date: visit.createdAt.toISOString().split('T')[0],
-    count: visit._count.id,
+
+  const visitsMap = visits.reduce((acc, visit) => {
+    const dateStr = visit.createdAt.toISOString().split("T")[0];
+    acc.set(dateStr, (acc.get(dateStr) || 0) + visit._count.id);
+    return acc;
+  }, new Map());
+
+
+  const allDates = [];
+  for (let d = new Date(startDate); d <= endDate; d.setDate(d.getDate() + 1)) {
+    allDates.push(new Date(d));
+  }
+
+
+  return allDates.map((date) => ({
+    date: date.toISOString().split("T")[0],
+    count: visitsMap.get(date.toISOString().split("T")[0]) || 0,
   }));
+}
+
+export const getGeographicalDistribution = asyncHandler(
+  async (req: AuthRequest, res) => {
+    const projectName = req.params.projectName;
+    const { fromDate, toDate } = req.query;
+
+    let whereClause: any = { projectName, country: { not: null } };
+
+    if (fromDate && toDate) {
+      const startDate = new Date(fromDate as string);
+      const endDate = new Date(toDate as string);
+      console.log(startDate);
+      console.log(endDate);
+      if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
+        throw new ApiError(
+          400,
+          "Invalid date format. Please use ISO 8601 format (YYYY-MM-DD)"
+        );
+      }
+
+      whereClause.createdAt = {
+        gte: startDate,
+        lte: endDate,
+      };
+    }
+
+    const distribution = await prisma.request.groupBy({
+      by: ["country"],
+      where: whereClause,
+      _count: {
+        country: true,
+      },
+    });
+
+    const result = distribution.reduce((acc, item) => {
+      acc[item.country!] = item._count.country;
+      return acc;
+    }, {} as Record<string, number>);
+
+    res.json(result);
+  }
+);
+
+async function getVisitCount(
+  projectName: string,
+  startDate: Date,
+  endDate: Date
+) {
+  return prisma.request.count({
+    where: {
+      projectName,
+      createdAt: {
+        gte: startDate,
+        lte: endDate,
+      },
+    },
+  });
 }
 
 export const updateCountryInfo = asyncHandler(async (req: AuthRequest, res) => {
@@ -113,6 +188,8 @@ export const updateCountryInfo = asyncHandler(async (req: AuthRequest, res) => {
       }
     }
   } else {
-    res.json({ message: "Country information already exists or IP address is missing" });
+    res.json({
+      message: "Country information already exists or IP address is missing",
+    });
   }
 });

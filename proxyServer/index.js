@@ -18,9 +18,8 @@ app.use(async (req, res) => {
     const hostname = req.hostname;
     const subdomain = hostname.split('.')[0];
     const resolvesTo = `${CDN_URL}/outputs/${subdomain}/`;
-    const clientIP = req.ip; // This is provided by the request-ip middleware
+    const clientIP = req.ip;
 
-    // Create request record before proxying
     try {
         await prismaClient.request.create({
             data: { projectName: subdomain, ipAddress: clientIP }

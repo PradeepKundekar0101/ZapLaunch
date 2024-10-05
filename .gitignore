@@ -4,3 +4,4 @@
 */build
 */.env
 proxyServer/.env
+*/src/services/scb.zip

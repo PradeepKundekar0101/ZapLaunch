@@ -74,7 +74,7 @@ export const createProject = asyncHandler(
 );
 export const updateProject = asyncHandler(
   async (req: AuthRequest, res: Response) => {
-    const {  buildCommand, installCommand,projectId,branch } =
+    const {  buildCommand, installCommand,projectId,branch,srcDir } =
       req.body;
     const existingProject = await prismaClient.project.findFirst({
       where: {
@@ -85,7 +85,7 @@ export const updateProject = asyncHandler(
       throw new ApiError(409, "Project Name already taken");
     }
     const updatedProject = await prismaClient.project.update({
-      where:{id:projectId},data:{buildCommand,installCommand,branch,lastModified:new Date()}
+      where:{id:projectId},data:{buildCommand,installCommand,branch,lastModified:new Date(),srcDir}
     })
     res
       .status(200)
@@ -377,19 +377,19 @@ export const getBranches = asyncHandler(
       throw new ApiError(400, "Project does not have a valid GitHub URL");
     }
 
-    // Extract the owner and repo name from the GitHub URL
+
     const [owner, repo] = githubUrl
       .replace("https://github.com/", "")
       .split("/");
 
-    // Fetch the user from the database
+
     const user = await prismaClient.user.findFirst({ where: { id: userId } });
     if (!user) {
       throw new ApiError(404, "User not found");
     }
 
     try {
-      // Fetch repository details to get the default branch
+
       const repoResponse = await axios.get(
         `https://api.github.com/repos/${owner}/${repo}`,
         {
@@ -400,10 +400,9 @@ export const getBranches = asyncHandler(
         }
       );
 
-      // Extract the default branch
       const defaultBranch = repoResponse.data.default_branch;
 
-      // Fetch the list of branches from the repository
+
       const branchesResponse = await axios.get(
         `https://api.github.com/repos/${owner}/${repo}/branches`,
         {
@@ -412,24 +411,51 @@ export const getBranches = asyncHandler(
             Accept: "application/vnd.github.v3+json",
           },
           params: {
-            per_page: 100, // Adjust as needed
+            per_page: 100, 
           },
         }
       );
 
-      // Extract relevant branch information
       const branches = branchesResponse.data.map((branch: any) => ({
         name: branch.name,
         commitSha: branch.commit.sha,
         protected: branch.protected,
-        isDefault: branch.name === defaultBranch, // Flag the default branch
+        isDefault: branch.name === defaultBranch, 
       }));
 
-      // Send the branch data as a response
       res.status(200).json(branches);
     } catch (error) {
       console.error("Error fetching GitHub branches:", error);
       res.status(500).json({ message: "Failed to fetch branches" });
     }
+  }
+);
+
+
+export const updateIsLive = asyncHandler(
+  async (req: AuthRequest, res: Response) => {
+    const projectId = req.params.projectId;
+    const {  isLive } = req.body;
+    const existingProject = await prismaClient.project.findFirst({
+      where: {
+        id:projectId,
+      },
+    });
+    if (existingProject && existingProject?.id!==projectId) {
+      throw new ApiError(409, "Project Name already taken");
+    }
+    const updatedProject = await prismaClient.project.update({
+      where:{id:projectId},data:{isLive}
+    })
+    res
+      .status(200)
+      .json(
+        new ApiResponse(
+          200,
+          "Project updated successfully",
+          { projectId: updatedProject.id },
+          true
+        )
+      );
   }
 );

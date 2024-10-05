@@ -7,6 +7,7 @@ import { cassandraClient } from "./services/cassandraClient";
 import projectRoute from "./routes/project";
 import userRoute from "./routes/user";
 import authRoute from "./routes/auth";
+import analytics from "./routes/analytics";
 import passport from "passport";
 import GitHubStrategy from "passport-github2";
 import { PrismaClient } from "@prisma/client";
@@ -134,6 +135,7 @@ app.use(cors({ origin: "*" }));
 app.use("/api/v1/project", projectRoute);
 app.use("/api/v1/user", userRoute);
 app.use("/api/v1/auth", authRoute);
+app.use("/api/v1/analytics", analytics);
 
 app.listen(PORT, () => {
   console.log("API server running at port " + PORT);
