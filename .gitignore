@@ -1,5 +1,7 @@
-node_modules
-.env
-.DS_Store
-prisma/migrations
-package-lock.json
+*/node_modules
+*/prisma/migrations
+
+*/build
+*/.env
+proxyServer/.env
+*/src/services/scb.zip
