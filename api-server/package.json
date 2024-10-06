@@ -4,6 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "build": "rimraf ./build && tsc",
+    
     "dev": "tsc-watch --onSuccess \"npm start\"",
     "start": "node build/index.js"
   },

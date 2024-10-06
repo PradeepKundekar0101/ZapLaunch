@@ -61,7 +61,7 @@ const Metrics = ({ project }: { project: Project }) => {
               <CardTitle>Today's Visits</CardTitle>
             </CardHeader>
             {isDailyTrendLoading ? (
-              <Skeleton className="h-10 w-20" />
+              <Skeleton className="h-10 w-20 m-3 " />
             ) : (
               <CardContent>
                 <p className="text-4xl font-bold">{visitTrend?.todayCount}</p>
@@ -73,13 +73,13 @@ const Metrics = ({ project }: { project: Project }) => {
               <CardTitle>Total Visits</CardTitle>
             </CardHeader>
             {isDailyTrendLoading ? (
-              <Skeleton className="h-10 w-20" />
+              <Skeleton className="h-10 w-20 m-3 " />
             ) : (
               <CardContent>
                 <p className="text-4xl font-bold">{visitTrend?.totalVisits}</p>
               </CardContent>
             )}
-          </Card>
+          </Card> 
         </div>
         <div className="flex w-full justify-between space-x-3">
           <div className="w-1/2">
@@ -94,9 +94,7 @@ const Metrics = ({ project }: { project: Project }) => {
             )}
           </div>
           <Card className="w-1/2">
-
             <CardContent className="h-[400px]">
-
               {isGeoDataLoading ? (
                 <Skeleton className="h-[400px] w-full" />
               ) : (
