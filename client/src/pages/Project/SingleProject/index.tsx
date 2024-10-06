@@ -16,7 +16,9 @@ import {
 import { ChartNoAxesColumn, GanttChart, List, SettingsIcon } from "lucide-react";
 import Metrics from "@/pages/Metrics";
 
+
 const SingleProject = () => {
+
   const { projectId } = useParams();
   const api = useAxios();
 
@@ -27,7 +29,9 @@ const SingleProject = () => {
         ?.project,
   });
   return (
-    <section>
+    <section className="">
+     
+
       {isProjectLoading ? (
         <Loader />
       ) : (
@@ -47,7 +51,8 @@ const SingleProject = () => {
           </Breadcrumb>
 
           <div>
-            <Tabs defaultValue="deployment" className="w-full">
+         
+            <Tabs defaultValue="deployment" onChange={()=>{}} className="w-full">
               <div className=" flex w-full justify-between">
                 <TabsList>
                   <TabsTrigger value="deployment">
@@ -65,7 +70,7 @@ const SingleProject = () => {
                 </TabsList>
               </div>
               <TabsContent value="deployment">
-                <Deployments projectId={projectId!} project={project!} />
+                <Deployments projectId={projectId!} project={project!}  />
               </TabsContent>
               <TabsContent value="metrics">
                 <Metrics  project={project!} />
@@ -80,6 +85,7 @@ const SingleProject = () => {
           </div>
         </>
       )}
+
     </section>
   );
 };

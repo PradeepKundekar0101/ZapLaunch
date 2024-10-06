@@ -177,6 +177,7 @@ export const deployProject = asyncHandler(
         installCommand:project.installCommand,
         buildCommand:project.buildCommand,
         token,
+        srcDir:project.srcDir
       }),
       QueueUrl: process.env.AWS_SQS_URL!,
     };
@@ -436,16 +437,10 @@ export const updateIsLive = asyncHandler(
   async (req: AuthRequest, res: Response) => {
     const projectId = req.params.projectId;
     const {  isLive } = req.body;
-    const existingProject = await prismaClient.project.findFirst({
-      where: {
-        id:projectId,
-      },
-    });
-    if (existingProject && existingProject?.id!==projectId) {
-      throw new ApiError(409, "Project Name already taken");
-    }
-    const updatedProject = await prismaClient.project.update({
-      where:{id:projectId},data:{isLive}
+    console.log(projectId)
+    console.log(isLive)
+    const updatedProject = await prismaClient.project.updateMany({
+      where:{projectName:projectId},data:{isLive}
     })
     res
       .status(200)
@@ -453,7 +448,7 @@ export const updateIsLive = asyncHandler(
         new ApiResponse(
           200,
           "Project updated successfully",
-          { projectId: updatedProject.id },
+          { projectId: updatedProject },
           true
         )
       );

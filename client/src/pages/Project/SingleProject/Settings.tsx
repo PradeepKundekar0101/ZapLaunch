@@ -27,18 +27,18 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import Loader from "@/components/ui/loader";
 
 const Settings = ({ project }: { project: Project }) => {
   const api = useAxios();
   const { projectId } = useParams();
   const [selectedBranch, setSelectedBranch] = useState<string>(project.branch);
-  const [installCommand, setInstallCommand] = useState<string>(
-    project.installCommand || ""
-  );
+  const [installCommand, setInstallCommand] = useState<string>(project.installCommand || "");
   const [projectName, setProjectName] = useState<string>(project.projectName);
   const [buildCommand, setBuildCommand] = useState<string>(
     project.buildCommand || ""
   );
+  const [srcDir, setSrcDir] = useState<string>(project.srcDir||"/");
 
   const { data: branches, isLoading: isBranchesLoading } = useQuery({
     queryKey: ["branches"],
@@ -61,6 +61,7 @@ const Settings = ({ project }: { project: Project }) => {
         buildCommand,
         projectId,
         projectName,
+        srcDir
       });
     },
     onSuccess: () => {
@@ -71,7 +72,7 @@ const Settings = ({ project }: { project: Project }) => {
     },
   });
 
-  // Mutation for deleting the project
+
   const deleteProjectMutation = useMutation({
     mutationKey: ["deleteProject"],
     mutationFn: async () => {
@@ -79,14 +80,13 @@ const Settings = ({ project }: { project: Project }) => {
     },
     onSuccess: () => {
       toast({ title: "Project deleted successfully", variant: "destructive" });
-      // Add further navigation or cleanup if required
     },
     onError: () => {
       toast({ title: "Failed to delete project", variant: "destructive" });
     },
   });
 
-  // Handle save click
+
   const handleSave = () => {
     updateProjectMutation.mutate();
   };
@@ -97,7 +97,7 @@ const Settings = ({ project }: { project: Project }) => {
     // }
   };
 
-  if (isBranchesLoading) return <div>Loading branches...</div>;
+  // if (isBranchesLoading) return <div>Loading branches...</div>;
 
   return (
     <Card className="p-4  shadow-md relative">
@@ -123,8 +123,10 @@ const Settings = ({ project }: { project: Project }) => {
           />
         </div>
         <div className="mb-4">
-          <h1>Branching</h1>
-          <Select
+          <h1 className="text-xl font-semibold mb-2">Source</h1>
+          <p className=" text-slate-400">Branch</p>
+          {
+            isBranchesLoading?<Loader/>:<Select
             defaultValue={selectedBranch}
             onValueChange={(value) => setSelectedBranch(value)}
           >
@@ -150,6 +152,16 @@ const Settings = ({ project }: { project: Project }) => {
               </SelectContent>
             </div>
           </Select>
+          }
+           <div className="my-4">
+          <p className=" text-slate-400">Source Directory</p>
+          <Input
+            value={srcDir}
+            onChange={(e) => setSrcDir(e.target.value)}
+            placeholder="/"
+          />
+        </div>
+          
         </div>
       </div>
 

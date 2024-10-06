@@ -55,33 +55,33 @@ export function LineChartComponent({
   const getTickInterval = () => {
     switch (timePeriod) {
       case "overall":
-        return 30; // Show every 30th tick
+        return 30; 
       case "lastYear":
-        return 30; // Show every 30th tick (approximately monthly)
+        return 30; 
       case "lastMonth":
-        return 5; // Show every 5th tick
+        return 5; 
       case "lastWeek":
-        return 1; // Show every tick
+        return 1; 
       case "lastDay":
-        return 2; // Show every 2nd tick
+        return 2; 
       default:
         return 1;
     }
   };
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="flex justify-between items-center">
-          <div>
-            <h1>Visits Trend</h1>
-          </div>
-          <div>
-            <Select
-              value={timePeriod}
-              defaultValue={"overall"}
-              onValueChange={(value: TimePeriod) => setTimePeriod(value)}
-            >
+    <Card className="h-full">
+    <CardHeader>
+      <CardTitle className="flex justify-between items-center">
+        <div>
+          <h1>Visits Trend</h1>
+        </div>
+        <div>
+          <Select
+            value={timePeriod}
+            defaultValue={"overall"}
+            onValueChange={(value: TimePeriod) => setTimePeriod(value)}
+          >
               <div className="flex items-center space-x-1">
                 <SelectTrigger className="w-[200px]">
                   <SelectValue placeholder="Select Time Period" />
@@ -104,19 +104,17 @@ export function LineChartComponent({
                   </SelectItem>
                 </SelectContent>
               </div>
-            </Select>
+              </Select>
           </div>
         </CardTitle>
       </CardHeader>
-      <CardContent>
-        <ChartContainer config={chartConfig}>
+      <CardContent className="h-[340px]"> {/* Adjust this height as needed */}
+        <ChartContainer className="h-full w-full" config={chartConfig}>
           <LineChart
-            height={50}
-            accessibilityLayer
             data={chartData}
             margin={{
-              left: 12,
               right: 12,
+              left: 12,
             }}
           >
             <CartesianGrid vertical={false} />
@@ -128,7 +126,8 @@ export function LineChartComponent({
               tickFormatter={formatXAxisTick}
               interval={getTickInterval()}
               textAnchor="end"
-              height={50}
+              height={30}
+              fontSize={10}
             />
             <ChartTooltip
               cursor={false}

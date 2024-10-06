@@ -24,7 +24,9 @@ export interface Project {
   installCommand:string;
   buildCommand:string;
   lastDeployed:string;
-  lastModified:string
+  lastModified:string;
+  isLive:boolean;
+  srcDir:string
 }
 
 export interface Deployment {

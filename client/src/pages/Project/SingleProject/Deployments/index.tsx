@@ -171,14 +171,17 @@ const Deployments = ({
 
   useEffect(() => {
     if (logContainerRef.current) {
-      logContainerRef.current.scrollTop = logContainerRef.current.scrollHeight;
+      logContainerRef.current.scrollTo({
+        top: logContainerRef.current.scrollHeight,
+        behavior: "smooth",
+      });
     }
   }, [logs, currentDeploymentLogs]);
 
   return (
     <Card className="relative overflow-hidden">
-       <div className="blob absolute h-96 w-96 bg-green-600 blur-3xl opacity-10 top-[-20vh] left-[-20vw]"></div>
-       <div className="blob absolute h-96 w-96 bg-blue-600 blur-3xl opacity-10 bottom-[-20vh] right-[-20vw]"></div>
+       <div className="blob absolute h-96 w-96 bg-green-600 blur-3xl opacity-10 top-0 left-10"></div>
+       <div className="blob absolute h-96 w-96 bg-blue-600 blur-3xl opacity-10 bottom-0 right-10"></div>
       <div className=" text-white p-4 rounded-lg relative ">
         { moment(project.lastModified).isAfter(moment(project.lastDeployed)) && <Alert className="">
           <Info className="h-4 w-4" />
@@ -249,7 +252,7 @@ const Deployments = ({
               </>
             }
            
-            <h1 className="my-2">Past Deployments</h1>
+            {deployments && Array.isArray(deployments) && deployments.length>1 && <h1 className="my-2">Past Deployments</h1>}
             {deployments?.map((deployment: Deployment,ind:number) => ( ind>0 && <>
             <DeploymentCard deployment={deployment} handleViewLogs={handleViewLogs}/>
             </>

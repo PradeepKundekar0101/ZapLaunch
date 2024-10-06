@@ -8,6 +8,7 @@ import { toast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
 import Loader from "@/components/ui/loader";
 
+
 const New = () => {
   const api = useAxios();
   const navigate = useNavigate();
@@ -77,8 +78,10 @@ const New = () => {
   );
 
   return (
-    <section className="flex justify-center min-h-screen bg-[#0B0A12] text-white">
-      <div className="w-full max-w-md">
+    <section className="flex justify-center min-h-screen text-white relative overflow-hidden">
+        <div className="blob absolute h-96 w-96 bg-blue-600 blur-3xl opacity-20 top-[0vh] left-0"></div>
+        <div className="blob absolute  h-52 w-52 bg-purple-600 blur-3xl opacity-10 bottom-20 right-0"></div>
+      <div className="w-full max-w-md relative">
         <div className="flex flex-col items-center mb-8">
           <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
             <path
@@ -115,19 +118,19 @@ const New = () => {
           {currentStep === 1 && (
             <div>
               <Button
-                className="flex items-center space-x-2 w-full justify-center py-6 bg-transparent hover:bg-[#232331] transition-colors"
+                className="flex items-center space-x-2 w-full justify-center py-6 bg-white hover:bg-[#232331] transition-colors"
                 onClick={() => setCurrentStep(2)}
               >
-                <GitHubLogoIcon color="white" className="mr-2" />
-                <span className="text-white">Deploy from GitHub repo</span>
+                <GitHubLogoIcon color="black" className="mr-2" />
+                <span className="text-black">Deploy from GitHub repo</span>
               </Button>
             </div>
           )}
 
           {currentStep === 2 && (
-            <div>
+            <div className="relative">
               <div className="p-4">
-                <div className="flex justify-between items-center mb-4">
+                <div className="flex justify-between items-center mb-4 ">
                   <h2 className="text-lg font-semibold">
                     Select a repository to deploy
                   </h2>
@@ -135,7 +138,7 @@ const New = () => {
                   <Button
                     variant="ghost"
                     size="icon"
-                    onClick={() => setCurrentStep(1)}
+                    onClick={() =>{ setCurrentStep(1); setSearchTerm("")}}
                   >
                     <Cross2Icon className="h-4 w-4" />
                   </Button>
@@ -143,7 +146,7 @@ const New = () => {
                 <Input
                   onChange={(e) => setSearchTerm(e.target.value)} // Update search term
                   placeholder="Search repo..."
-                  className="mb-2"
+                  className="mb-2 relative"
                 />
 
                 {isLoading ? (

@@ -79,3 +79,9 @@
 
 
 }
+
+.text-gradient1{
+  background-image: linear-gradient(-180deg,#444444,#fff);
+  -webkit-text-fill-color: transparent;
+  -webkit-background-clip: text;
+}
