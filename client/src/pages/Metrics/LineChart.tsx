@@ -55,15 +55,15 @@ export function LineChartComponent({
   const getTickInterval = () => {
     switch (timePeriod) {
       case "overall":
-        return 30; // Show every 30th tick
+        return 30; 
       case "lastYear":
-        return 30; // Show every 30th tick (approximately monthly)
+        return 30; 
       case "lastMonth":
-        return 5; // Show every 5th tick
+        return 5; 
       case "lastWeek":
-        return 1; // Show every tick
+        return 1; 
       case "lastDay":
-        return 2; // Show every 2nd tick
+        return 2; 
       default:
         return 1;
     }
@@ -111,12 +111,14 @@ export function LineChartComponent({
       <CardContent>
         <ChartContainer config={chartConfig}>
           <LineChart
-            height={50}
+            height={200}
             accessibilityLayer
             data={chartData}
             margin={{
-              left: 12,
+              top: 10,
               right: 12,
+              left: 12,
+              bottom: 20,
             }}
           >
             <CartesianGrid vertical={false} />
@@ -128,7 +130,8 @@ export function LineChartComponent({
               tickFormatter={formatXAxisTick}
               interval={getTickInterval()}
               textAnchor="end"
-              height={50}
+              height={30}
+              fontSize={10}
             />
             <ChartTooltip
               cursor={false}

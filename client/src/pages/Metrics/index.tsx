@@ -75,7 +75,7 @@ const Metrics = ({ project }: { project: Project }) => {
       />
       <Card>
         <CardContent className="h-80">
-          <p className="text-lg">{visitTrend?.trendDescription}</p>
+          <h1 className=" text-white">Hello</h1>
         </CardContent>
       </Card>
     </div>

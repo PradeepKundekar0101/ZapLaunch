@@ -22,7 +22,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { GitHubLogoIcon } from "@radix-ui/react-icons";
+
 
 const Navbar = () => {
   const { token, user } = useAppSelector((state) => state?.auth);
@@ -51,7 +51,7 @@ const Navbar = () => {
     <div className=" py-4 flex items-center justify-between lg:mx-[20vw]">
       <div><Link to={"/"}>Coderbro</Link></div>
       {isAuthenticated ? (<div className=" flex items-center">
-        <Button>Github <GitHubLogoIcon/> </Button>
+        <Button onClick={()=>{window.location.href=("https://github.com/PradeepKundekar0101/LaunchPilot-prod/")}} variant={"outline"}>Star on Github 🌟 </Button>
         <Button variant={"link"} onClick={()=>{navigate("/dashboard")}}>Dashboard</Button>
         <DropdownMenu>
           <DropdownMenuTrigger>
@@ -75,7 +75,7 @@ const Navbar = () => {
         </DropdownMenu></div>
       ) : (
         <div className="flex space-x-2">
-           <Button variant={"outline"}>Star on Github 🌟 </Button>
+           <Button onClick={()=>{window.location.href=("https://github.com/PradeepKundekar0101/LaunchPilot-prod/")}} variant={"outline"}>Star on Github 🌟 </Button>
           <Dialog>
             <DialogTrigger>
               <Button variant="secondary">Login</Button>
