@@ -71,5 +71,5 @@ model Request {
   createdAt   DateTime @default(now())
   country     String?
 
-  @@index([ipAddress, projectName])
+  @@index([ipAddress, projectName, country])
 }

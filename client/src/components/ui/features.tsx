@@ -1,67 +1,69 @@
 import { cn } from "@/lib/utils";
 import {
-    Bolt,
-    Cloud,
-    DollarSign,
-    InboxIcon,
-    Heart,
-    HelpCircle,
-    Terminal,
-    RouteIcon
+  Rocket,
+  Server,
+  GitBranch,
+  ClipboardCheck,
+  TrendingUp,
+  ShieldCheck,
+  RefreshCcw,
+  UserCheck,
 } from "lucide-react";
-
-
 
 export function Features() {
   const features = [
     {
-      title: "Built for developers",
+      title: "Effortless Deployment",
       description:
-        "Built for engineers, developers, dreamers, thinkers and doers.",
-      icon: <Terminal />,
+        "Deploy your React applications with just a few clicks, no DevOps expertise required.",
+      icon: <Rocket />,
     },
     {
-      title: "Ease of use",
+      title: "GitHub Integration",
       description:
-        "It's as easy as using an Apple, and as expensive as buying one.",
-      icon: <InboxIcon />,
+        "Seamlessly connect your GitHub repositories, select branches, and deploy instantly.",
+      icon: <GitBranch />,
     },
     {
-      title: "Pricing like no other",
+      title: "Real-time Build Logs",
       description:
-        "Our prices are best in the market. No cap, no lock, no credit card required.",
-      icon: <DollarSign />,
+        "Monitor your deployments in real-time with live logs directly from the build container.",
+      icon: <Server />,
     },
     {
-      title: "100% Uptime guarantee",
-      description: "We just cannot be taken down by anyone.",
-      icon: <Cloud />,
-    },
-    {
-      title: "Multi-tenant Architecture",
-      description: "You can simply share passwords instead of buying new seats",
-      icon: <RouteIcon />,
-    },
-    {
-      title: "24/7 Customer Support",
+      title: "Customizable Build Commands",
       description:
-        "We are available a 100% of the time. Atleast our AI Agents are.",
-      icon: <HelpCircle />,
+        "Run custom install and build commands, giving you full control over the deployment process.",
+      icon: <ClipboardCheck />,
     },
     {
-      title: "Money back guarantee",
+      title: "Scalable Infrastructure",
       description:
-        "If you donot like EveryAI, we will convince you to like us.",
-      icon: <Bolt />,
+        "Powered by AWS, ensuring scalability, reliability, and performance under any load.",
+      icon: <TrendingUp />,
     },
     {
-      title: "And everything else",
-      description: "I just ran out of copy ideas. Accept my sincere apologies",
-      icon: <Heart />,
+      title: "Security First",
+      description:
+        "Encrypted connections and secure AWS architecture protect your deployments and data.",
+      icon: <ShieldCheck />,
+    },
+    {
+      title: "100% Uptime",
+      description:
+        "With distributed architecture and robust infrastructure, we ensure maximum uptime.",
+      icon: <RefreshCcw />,
+    },
+    {
+      title: "Visitor Analytics",
+      description:
+        "Track user trends and geolocation data to gain insights into your app's performance.",
+      icon: <UserCheck />,
     },
   ];
+
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4  relative z-10 py-10 max-w-7xl mx-auto">
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 relative z-10 py-10 max-w-7xl mx-auto">
       {features.map((feature, index) => (
         <Feature key={feature.title} {...feature} index={index} />
       ))}
@@ -83,7 +85,7 @@ const Feature = ({
   return (
     <div
       className={cn(
-        "flex flex-col lg:border-r  py-10 relative group/feature dark:border-neutral-800",
+        "flex flex-col lg:border-r py-10 relative group/feature dark:border-neutral-800",
         (index === 0 || index === 4) && "lg:border-l dark:border-neutral-800",
         index < 4 && "lg:border-b dark:border-neutral-800"
       )}

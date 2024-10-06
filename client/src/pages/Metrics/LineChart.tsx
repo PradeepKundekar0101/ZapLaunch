@@ -70,18 +70,18 @@ export function LineChartComponent({
   };
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="flex justify-between items-center">
-          <div>
-            <h1>Visits Trend</h1>
-          </div>
-          <div>
-            <Select
-              value={timePeriod}
-              defaultValue={"overall"}
-              onValueChange={(value: TimePeriod) => setTimePeriod(value)}
-            >
+    <Card className="h-full">
+    <CardHeader>
+      <CardTitle className="flex justify-between items-center">
+        <div>
+          <h1>Visits Trend</h1>
+        </div>
+        <div>
+          <Select
+            value={timePeriod}
+            defaultValue={"overall"}
+            onValueChange={(value: TimePeriod) => setTimePeriod(value)}
+          >
               <div className="flex items-center space-x-1">
                 <SelectTrigger className="w-[200px]">
                   <SelectValue placeholder="Select Time Period" />
@@ -104,21 +104,17 @@ export function LineChartComponent({
                   </SelectItem>
                 </SelectContent>
               </div>
-            </Select>
+              </Select>
           </div>
         </CardTitle>
       </CardHeader>
-      <CardContent>
-        <ChartContainer config={chartConfig}>
+      <CardContent className="h-[340px]"> {/* Adjust this height as needed */}
+        <ChartContainer className="h-full w-full" config={chartConfig}>
           <LineChart
-            height={200}
-            accessibilityLayer
             data={chartData}
             margin={{
-              top: 10,
               right: 12,
               left: 12,
-              bottom: 20,
             }}
           >
             <CartesianGrid vertical={false} />

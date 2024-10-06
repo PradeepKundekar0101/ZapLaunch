@@ -82,19 +82,16 @@ async function getDailyTrends(
     },
   });
 
-
   const visitsMap = visits.reduce((acc, visit) => {
     const dateStr = visit.createdAt.toISOString().split("T")[0];
     acc.set(dateStr, (acc.get(dateStr) || 0) + visit._count.id);
     return acc;
   }, new Map());
 
-
   const allDates = [];
   for (let d = new Date(startDate); d <= endDate; d.setDate(d.getDate() + 1)) {
     allDates.push(new Date(d));
   }
-
 
   return allDates.map((date) => ({
     date: date.toISOString().split("T")[0],
@@ -105,60 +102,53 @@ async function getDailyTrends(
 export const getGeographicalDistribution = asyncHandler(
   async (req: AuthRequest, res) => {
     const projectName = req.params.projectName;
-    const { fromDate, toDate } = req.query;
+    const requestsWithoutCountry = await prisma.request.findMany({
+      where: {
+        projectName,
+        country: undefined,
+      },
+      select: {
+        id: true,
+        ipAddress: true,
+      },
+    });
 
-    let whereClause: any = { projectName, country: { not: null } };
+    if (requestsWithoutCountry.length > 0) {
+      const updatePromises = requestsWithoutCountry.map(async (request) => {
+        try {
+          const ipDetails = await ipinfo.lookupIp(request.ipAddress || "");
+          console.log(ipDetails)
+          const country = ipDetails.country || "Unknown";
 
-    if (fromDate && toDate) {
-      const startDate = new Date(fromDate as string);
-      const endDate = new Date(toDate as string);
-      console.log(startDate);
-      console.log(endDate);
-      if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
-        throw new ApiError(
-          400,
-          "Invalid date format. Please use ISO 8601 format (YYYY-MM-DD)"
-        );
-      }
+          return prisma.request.update({
+            where: { id: request.id },
+            data: { country },
+          });
+        } catch (error) {
+          console.error(`Failed to update request ${request.id}:`, error);
+          return null;
+        }
+      });
 
-      whereClause.createdAt = {
-        gte: startDate,
-        lte: endDate,
-      };
+      await Promise.all(updatePromises);
     }
 
     const distribution = await prisma.request.groupBy({
       by: ["country"],
-      where: whereClause,
+      where: { projectName },
       _count: {
         country: true,
       },
     });
 
     const result = distribution.reduce((acc, item) => {
-      acc[item.country!] = item._count.country;
+      acc[item.country ?? "Unknown"] = item._count.country;
       return acc;
     }, {} as Record<string, number>);
 
     res.json(result);
   }
 );
-
-async function getVisitCount(
-  projectName: string,
-  startDate: Date,
-  endDate: Date
-) {
-  return prisma.request.count({
-    where: {
-      projectName,
-      createdAt: {
-        gte: startDate,
-        lte: endDate,
-      },
-    },
-  });
-}
 
 export const updateCountryInfo = asyncHandler(async (req: AuthRequest, res) => {
   const { id } = req.params;

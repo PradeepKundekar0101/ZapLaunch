@@ -74,7 +74,7 @@ const FeatureDescription = ({ children }: { children?: React.ReactNode }) => {
 
 export const SkeletonFour = () => {
   return (
-    <div className="h-full w-full flex items-center justify-center relative bg-transparent dark:bg-transparent">
+    <div className="h-full w-full flex items-center justify-center relative bg-transparent dark:bg-transparent ">
       <Globe className="w-full h-full" />
     </div>
   );
@@ -97,14 +97,13 @@ export const Globe = ({ className }: { className?: string }) => {
       dark: 1,
       diffuse: 1.2,
       mapSamples: 16000,
-      mapBrightness: 6,
-      baseColor: [0.3, 0.3, 0.3],
-      markerColor: [0.1, 0.8, 1],
-      glowColor: [1, 1, 1],
+      mapBrightness: 7,
+      baseColor: [0.1, 0.16, 0.23],
+      markerColor: [0, 1, 0],
+      glowColor: [0, 0.3, 0.6],
       markers: [
-        // AWS CloudFront Edge Locations (sample)
-        { location: [37.7749, -122.4194], size: 0.03 }, // San Francisco
-        { location: [40.7128, -74.0060], size: 0.03 }, // New York
+        { location: [37.7749, -122.4194], size: 0.03 },
+        { location: [40.7128, -74.0060], size: 0.03 }, 
         { location: [51.5074, -0.1278], size: 0.03 },  // London
         { location: [35.6762, 139.6503], size: 0.03 }, // Tokyo
         { location: [-33.8688, 151.2093], size: 0.03 }, // Sydney
@@ -126,6 +125,7 @@ export const Globe = ({ className }: { className?: string }) => {
 
   return (
     <canvas
+      
       ref={canvasRef}
       style={{
         width: '100%',
