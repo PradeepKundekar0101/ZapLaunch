@@ -45,10 +45,9 @@ const Dashboard = () => {
       );
     }
   });
-  console.log(sortedProjects)
+  console.log(sortedProjects);
   return (
     <section className="">
-       
       <div className="flex justify-between border-b-[0.5px] border-b-[#292929] py-10">
         <div className="flex items-center space-x-2">
           <Avatar>
@@ -72,6 +71,7 @@ const Dashboard = () => {
       <div className="flex justify-between mt-2">
         <div className=" flex items-center space-x-4">
           <h1 className=" text-md text-slate-500">
+            {isLoading && "Loading..."}
             {projects &&
               projects.projects &&
               projects.projects?.length + " projects"}
@@ -125,42 +125,53 @@ const Dashboard = () => {
       </div>
 
       <div
-      className={`mt-5 ${
-        layout === "list"
-          ? "flex flex-col space-y-3"
-          : "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
-      }`}
-    >
-      {isLoading && <Loader  />}
-      {!isLoading && sortedProjects?.length === 0 && (
-        <div className="text-slate-400 text-center py-10">
-          <h1 className="text-xl font-semibold">No projects found</h1>
-          <p className="mt-2">Please create a new project to get started.</p>
-        </div>
-      )}
-      {sortedProjects?.map((project:Project) => (
-        <Link
-          key={project.id}
-          className={`bg-slate-800 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 ${
-            layout === "list" ? "p-4" : "p-6"
-          }`}
-          to={`/project/${project.id}`}
-        >
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-lg font-semibold text-white">{project.projectName}</h2>
-            <div className={`w-3 h-3 rounded-full ${project.isLive ? 'bg-green-500' : 'bg-red-500'}`} />
+        className={`mt-5 ${
+          layout === "list"
+            ? "flex flex-col space-y-3"
+            : "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
+        }`}
+      >
+        {isLoading && <Loader />}
+        {!isLoading && sortedProjects?.length === 0 && (
+          <div className="text-slate-400 text-center py-10">
+            <h1 className="text-xl font-semibold">No projects found</h1>
+            <p className="mt-2">Please create a new project to get started.</p>
           </div>
-          <div className="space-y-2 text-sm text-slate-300">
-            <p>Created: {moment(project.createdAt).format('MMMM D, YYYY')}</p>
-            <p>Last deployed: {project.lastDeployed ? moment(project.lastDeployed).fromNow() : 'Never'}</p>
-          </div>
-          <div className="mt-4 flex justify-between items-center text-xs text-slate-400">
-            <span>{project.gitUrl.split('/').pop()}</span>
-            <span>{moment(project.lastModified).fromNow()}</span>
-          </div>
-        </Link>
-      ))}
-    </div>
+        )}
+        {sortedProjects?.map((project: Project) => (
+          <Link
+            key={project.id}
+            className={`bg-slate-800 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 ${
+              layout === "list" ? "p-4" : "p-6"
+            }`}
+            to={`/project/${project.id}`}
+          >
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-lg font-semibold text-white">
+                {project.projectName}
+              </h2>
+              <div
+                className={`w-3 h-3 rounded-full ${
+                  project.isLive ? "bg-green-500" : "bg-red-500"
+                }`}
+              />
+            </div>
+            <div className="space-y-2 text-sm text-slate-300">
+              <p>Created: {moment(project.createdAt).format("MMMM D, YYYY")}</p>
+              <p>
+                Last deployed:{" "}
+                {project.lastDeployed
+                  ? moment(project.lastDeployed).fromNow()
+                  : "Never"}
+              </p>
+            </div>
+            <div className="mt-4 flex justify-between items-center text-xs text-slate-400">
+              <span>{project.gitUrl.split("/").pop()}</span>
+              <span>{moment(project.lastModified).fromNow()}</span>
+            </div>
+          </Link>
+        ))}
+      </div>
     </section>
   );
 };
