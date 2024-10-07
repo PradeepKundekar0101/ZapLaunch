@@ -1,7 +1,7 @@
 const express = require("express");
 const httpProxy = require("http-proxy");
 const dotenv = require("dotenv");
-const requestIp = require("request-ip");
+
 dotenv.config();
 const { PrismaClient } = require("@prisma/client");
 
@@ -11,8 +11,6 @@ const CDN_URL = process.env.AWS_CDN_URL || "";
 const proxy = httpProxy.createProxy();
 const prismaClient = new PrismaClient();
 
-// Use the request-ip middleware
-app.use(requestIp.mw());
 
 app.use(async (req, res) => {
     const hostname = req.hostname;
