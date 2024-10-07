@@ -7,3 +7,4 @@ proxyServer/.env
 */src/services/scb.zip
 
 */dist
+*/*/prisma/migrations
