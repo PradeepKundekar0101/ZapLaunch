@@ -3,7 +3,7 @@ import dotenv from "dotenv";
 import cors from "cors";
 import Redis from "ioredis";
 import { uuid } from "uuidv4";
-import { cassandraClient, downloadScbFromS3 } from "./services/cassandraClient";
+import { cassandraClient } from "./services/cassandraClient";
 import projectRoute from "./routes/project";
 import userRoute from "./routes/user";
 import authRoute from "./routes/auth";
@@ -11,44 +11,39 @@ import analytics from "./routes/analytics";
 import passport from "passport";
 import GitHubStrategy from "passport-github2";
 import { PrismaClient } from "@prisma/client";
-import { pingExternalServer } from "./utils/ping";
 dotenv.config();
 const PORT = process.env.PORT || 8000;
 const prismaClient = new PrismaClient();
 const REDIS_URI = process.env.REDIS_URI || "";
 let deploymentId = "";
 
-const initCassandar = async () => {
-  await downloadScbFromS3();
-  cassandraClient
-    .connect()
-    .then(() => {
-      console.log("Cassandra Client connected Successfully! ");
-      cassandraClient
-        .execute(
-          `
-      CREATE TABLE IF NOT EXISTS default_keyspace.Logs (
-        event_id UUID,
-        deploymentId UUID,
-        log text,
-        timestamp timestamp,
-        PRIMARY KEY (event_id)
-        );
+cassandraClient
+  .connect()
+  .then(() => {
+    console.log("Cassandra Client connected Successfully! ");
+    cassandraClient
+      .execute(
         `
-        )
-        .then((result) => {
-          console.log("Table created");
-        })
-        .catch((error) => {
-          console.log("first");
-          console.error("Error executing query:", error.message);
-        });
-    })
-    .catch((e: Error) => {
-      console.log(e.message);
-    });
-};
-initCassandar();
+    CREATE TABLE IF NOT EXISTS default_keyspace.Logs (
+      event_id UUID,
+      deploymentId UUID,
+      log text,
+      timestamp timestamp,
+      PRIMARY KEY (event_id)
+      );
+      `
+      )
+      .then((result) => {
+        console.log("Table created");
+      })
+      .catch((error) => {
+        console.log("first");
+        console.error("Error executing query:", error.message);
+      });
+  })
+  .catch((e: Error) => {
+    console.log(e.message);
+  });
 
 const app = express();
 app.use(passport.initialize());
@@ -60,7 +55,7 @@ const subscriber = new Redis(REDIS_URI);
 
 const initSubscriber = async () => {
   subscriber.psubscribe("logs:*");
-  console.log("Redis subscribed to Logs Channel");
+  console.log("Redis subscribed to Logs Channel")
   subscriber.on(
     "pmessage",
     async (pattern: string, channel: string, message: string) => {
@@ -84,9 +79,14 @@ passport.use(
     {
       clientID: process.env.GITHUB_CLIENT_ID || "",
       clientSecret: process.env.GITHUB_CLIENT_SECRET || "",
-      callbackURL: process.env.API_SERVER_URL + "/api/v1/auth/github/callback",
+      callbackURL:  process.env.API_SERVER_URL+"/api/v1/auth/github/callback",
     },
-    async (accessToken: string, profile: any, done: any) => {
+    async (
+      accessToken: string,
+      refreshToken: string,
+      profile: any,
+      done: any
+    ) => {
       try {
         let user = await prismaClient.user.findFirst({
           where: { githubId: profile.githubId },
@@ -139,5 +139,4 @@ app.use("/api/v1/analytics", analytics);
 
 app.listen(PORT, () => {
   console.log("API server running at port " + PORT);
-  setInterval(pingExternalServer, 30000);
 });
