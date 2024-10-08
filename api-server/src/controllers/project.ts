@@ -302,7 +302,7 @@ export const getLogs = asyncHandler(async (req: AuthRequest, res: Response) => {
   try {
     const result = await cassandraClient.execute(
       `
-          SELECT * FROM default_keyspace.Logs WHERE deploymentId = ? ALLOW FILTERING;
+          SELECT * FROM default_keyspace.Logs WHERE deployment_id = ? ALLOW FILTERING;
       `,
       [deployId]
     );
