@@ -220,7 +220,7 @@ const Deployments = ({
             <a className="" href={project.gitUrl}>
               {project.gitUrl.split("/").pop()}
             </a>
-           { deployments && deployments?.length>0 && <a className="text-sm flex items-center" target="_blank" href={`http://${project.projectName}.localhost:3000`}><span className={`flex items-center ${currentDeploymentStatus=="DEPLOYED" || deployments?.length>0 && deployments[0].status==="DEPLOYED"&& "text-green-400"}`}>
+           { deployments && deployments?.length>0 && <a className="text-sm flex items-center" target="_blank" href={`https://${project.projectName}.zaplaunch.tech`}><span className={`flex items-center ${currentDeploymentStatus=="DEPLOYED" || deployments?.length>0 && deployments[0].status==="DEPLOYED"&& "text-green-400"}`}>
              
               <ExternalLinkIcon className={`mr-1 `} size={16}/>  Visit site </span>  </a>}
           </div>

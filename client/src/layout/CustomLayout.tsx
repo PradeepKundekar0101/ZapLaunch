@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 import { Toaster } from "@/components/ui/toaster";
 import Navbar from "@/components/ui/navbar";
 import { Footer } from "@/components/ui/footer";
@@ -10,7 +10,7 @@ type Props = {
 
 function DefaultLayout({ children }: Props) {
   return (
-    <motion.main 
+    <motion.main
       className="flex flex-col min-h-screen overflow-hidden"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
@@ -23,10 +23,10 @@ function DefaultLayout({ children }: Props) {
       >
         <Navbar />
       </motion.div>
-      
+
       <Toaster />
-      
-      <motion.section 
+
+      <motion.section
         className="flex-grow px-8 max-md:px-8 lg:px-[5vw] xl:px-[10vw] 2xl:px-[20vw] py-4 mb-4"
         initial={{ y: 50, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
@@ -34,13 +34,13 @@ function DefaultLayout({ children }: Props) {
       >
         {children}
       </motion.section>
-      
+
       <motion.div
         initial={{ y: 50, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.5, delay: 0.4 }}
       >
-        {window.location.pathname=="/" && <Footer />}
+        {window.location.pathname == "/" && <Footer />}
       </motion.div>
     </motion.main>
   );

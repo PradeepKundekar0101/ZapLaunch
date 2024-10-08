@@ -11,6 +11,7 @@ import analytics from "./routes/analytics";
 import passport from "passport";
 import GitHubStrategy from "passport-github2";
 import { PrismaClient } from "@prisma/client";
+import session from "express-session";
 dotenv.config();
 const PORT = process.env.PORT || 8000;
 const prismaClient = new PrismaClient();
@@ -46,7 +47,22 @@ cassandraClient
   });
 
 const app = express();
+app.use(
+  session({
+    resave: false,
+    saveUninitialized: true,
+    secret: process.env.SESSION_SECRET!,
+  })
+);
+
 app.use(passport.initialize());
+app.use(passport.session());
+passport.serializeUser(function (user, cb) {
+  cb(null, user);
+});
+passport.deserializeUser(function (obj: any, cb) {
+  cb(null, obj);
+});
 app.get("/", (req, res) => {
   res.send("Hello from launch pilot");
 });
@@ -55,7 +71,7 @@ const subscriber = new Redis(REDIS_URI);
 
 const initSubscriber = async () => {
   subscriber.psubscribe("logs:*");
-  console.log("Redis subscribed to Logs Channel")
+  console.log("Redis subscribed to Logs Channel");
   subscriber.on(
     "pmessage",
     async (pattern: string, channel: string, message: string) => {
@@ -79,7 +95,7 @@ passport.use(
     {
       clientID: process.env.GITHUB_CLIENT_ID || "",
       clientSecret: process.env.GITHUB_CLIENT_SECRET || "",
-      callbackURL:  process.env.API_SERVER_URL+"/api/v1/auth/github/callback",
+      callbackURL: process.env.API_SERVER_URL + "/api/v1/auth/github/callback",
     },
     async (
       accessToken: string,
@@ -88,9 +104,12 @@ passport.use(
       done: any
     ) => {
       try {
+
+
         let user = await prismaClient.user.findFirst({
-          where: { githubId: profile.githubId },
+          where: { githubId: profile.id },
         });
+
         if (!user) {
           user = await prismaClient.user.create({
             data: {
@@ -114,6 +133,7 @@ passport.use(
               githubAccessToken: accessToken || "",
             },
           });
+
         } else {
           user = await prismaClient.user.update({
             where: { id: user.id },
@@ -121,9 +141,12 @@ passport.use(
               githubAccessToken: accessToken,
             },
           });
+          console.log("Existing user updated:", user);
         }
+
         return done(null, user);
       } catch (error) {
+        console.error("Error in GitHub strategy:", error);
         return done(error);
       }
     }

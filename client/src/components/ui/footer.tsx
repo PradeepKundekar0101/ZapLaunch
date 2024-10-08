@@ -7,9 +7,9 @@ export function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
 
           <div>
-            <h3 className="text-lg font-bold text-white mb-4">About LaunchPilot</h3>
+            <h3 className="text-lg font-bold text-white mb-4">About ZapLaunch</h3>
             <p className="text-sm">
-              LaunchPilot simplifies deployment for developers, providing seamless GitHub integration, real-time monitoring, and visitor analytics. Empower your apps to go live effortlessly!
+              ZapLaunch simplifies deployment for developers, providing seamless GitHub integration, real-time monitoring, and visitor analytics. Empower your apps to go live effortlessly!
             </p>
           </div>
 
@@ -27,16 +27,16 @@ export function Footer() {
 
           <div>
             <h3 className="text-lg font-bold text-white mb-4">Connect with Us</h3>
-            <p className="text-sm mb-4">Stay updated with LaunchPilot on our social platforms.</p>
+            <p className="text-sm mb-4">Stay updated with the developer on our social platforms.</p>
             <div className="flex space-x-4">
-              <a href="https://twitter.com" aria-label="Twitter" className="hover:text-white">
-                <Twitter className="w-5 h-5" />
-              </a>
-              <a href="https://github.com" aria-label="GitHub" className="hover:text-white">
+              <a target="_blank" href="https://github.com/pradeepkundekar0101" aria-label="GitHub" className="hover:text-white">
                 <Github className="w-5 h-5" />
               </a>
-              <a href="https://linkedin.com" aria-label="LinkedIn" className="hover:text-white">
+              <a target="_blank" href="https://linkedin.com/in/pradeepkundekar" aria-label="LinkedIn" className="hover:text-white">
                 <Linkedin className="w-5 h-5" />
+              </a>
+              <a target="_blank" href="https://twitter.com/pradeepdev_07" aria-label="X" className="hover:text-white">
+                <Twitter  className="w-5 h-5" />
               </a>
             </div>
           </div>
@@ -44,7 +44,7 @@ export function Footer() {
 
         {/* Divider */}
         <div className="border-t border-gray-700 mt-10 pt-6 text-center">
-          <p className="text-sm">&copy; {new Date().getFullYear()} LaunchPilot. All rights reserved.</p>
+          <p className="text-sm">&copy; {new Date().getFullYear()} ZapLaunch. All rights reserved.</p>
         </div>
       </div>
     </footer>

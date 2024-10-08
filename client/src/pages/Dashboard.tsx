@@ -133,9 +133,9 @@ const Dashboard = () => {
       >
         {isLoading && <Loader />}
         {!isLoading && sortedProjects?.length === 0 && (
-          <div className="text-slate-400 text-center py-10">
-            <h1 className="text-xl font-semibold">No projects found</h1>
-            <p className="mt-2">Please create a new project to get started.</p>
+          <div className="text-slate-400 text-center py-10 w-full flex justify-center flex-col">
+            <h1 className="text-xl font-semibold text-center">No projects found</h1>
+            <p className="mt-2 text-center">Please create a new project to get started.</p>
           </div>
         )}
         {sortedProjects?.map((project: Project) => (
