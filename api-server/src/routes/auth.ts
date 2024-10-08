@@ -10,14 +10,12 @@ router.get(
   "/github/callback",
   passport.authenticate("github", { session: false }),
   (req, res) => {
-    console.log(req.user);
     const token = generateToken(req.user);
-    res.redirect(`http://localhost:5173/auth-callback?token=${token}`);
+    res.redirect(`https://zaplaunch.tech/auth-callback?token=${token}`);
+    // res.redirect(`http://localhost:5173/auth-callback?token=${token}`);
   }
 );
 const generateToken = (user: any) => {
-  console.log("JWT_SECRET");
-  console.log(JWT_SECRET);
   return jwt.sign(
     {
       id: user.id,
