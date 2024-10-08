@@ -30,6 +30,7 @@ router.get(
   (req, res) => {
     const token = generateToken(req.user);
     res.redirect(`https://zaplaunch.tech/auth-callback?token=${token}`);
+    // res.redirect(`http://localhost:5173/auth-callback?token=${token}`);
   }
 );
 router.get('/signout', (req, res) => {

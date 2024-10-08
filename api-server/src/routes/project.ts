@@ -1,5 +1,5 @@
 import express from "express";
-import {createProject,deployProject,getAllProjects,changeStatus,getDeploymentsByProjectID,getLogs, getRepos, getProjectById, getBranches, updateProject, updateEnvFields, updateIsLive} from '../controllers/project'
+import {createProject,deployProject,getAllProjects,changeStatus,getDeploymentsByProjectID,getLogs, getRepos, getProjectById, getBranches, updateProject, updateEnvFields, updateIsLive, deleteProject} from '../controllers/project'
 import { validateProject } from "../middleware/zodValidators";
 import { authenticateToken } from "../middleware/auth";
 import { projectSchema } from "../validationSchema/project";
@@ -22,6 +22,8 @@ router.put("/deploy/:deployId",changeStatus);
 router.put("/:projectId",authenticateToken,updateProject);
 router.put("/isLive/:projectId",updateIsLive);
 router.put("/env/:projectId",authenticateToken,updateEnvFields);
+
+router.delete("/:projectId",authenticateToken,deleteProject)
 
 
 export default router

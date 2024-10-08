@@ -3,11 +3,11 @@ import { asyncHandler } from "../utils/AsyncHandler";
 import { ApiResponse } from "../utils/ApiResponse";
 import { PrismaClient } from "@prisma/client";
 import { ApiError } from "../utils/ApiError";
-
 import { cassandraClient } from "../services/cassandraClient";
 import AWS from "aws-sdk";
 import { getSQSConfig } from "../aws/SQSconfig";
 import axios from "axios";
+import { deleteS3Folder } from "../aws/S3";
 
 const prismaClient = new PrismaClient();
 
@@ -432,7 +432,6 @@ export const getBranches = asyncHandler(
   }
 );
 
-
 export const updateIsLive = asyncHandler(
   async (req: AuthRequest, res: Response) => {
     const projectId = req.params.projectId;
@@ -449,6 +448,36 @@ export const updateIsLive = asyncHandler(
           200,
           "Project updated successfully",
           { projectId: updatedProject },
+          true
+        )
+      );
+  }
+);
+
+export const deleteProject = asyncHandler(
+  async (req: AuthRequest, res: Response) => {
+    const projectId = req.params.projectId;
+    const existingProject = await prismaClient.project.findFirst({
+      where: {
+        id:projectId,
+      },
+    });
+    if (!existingProject) {
+      throw new ApiError(404, "Project not found");
+    }
+    const bucketName = process.env.AWS_BUCKET_NAME!;
+    const s3Key = `/outputs/${existingProject.projectName}`;
+    await deleteS3Folder(bucketName, s3Key);
+    await prismaClient.request.deleteMany({where:{projectName:existingProject.projectName}});
+    await prismaClient.project.delete({where:{id:projectId}});
+
+    res
+      .status(200)
+      .json(
+        new ApiResponse(
+          200,
+          "Project deleted successfully",
+          {},
           true
         )
       );
