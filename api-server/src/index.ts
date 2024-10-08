@@ -12,6 +12,7 @@ import passport from "passport";
 import GitHubStrategy from "passport-github2";
 import { PrismaClient } from "@prisma/client";
 import session from "express-session";
+import { pingExternalServer } from "./utils/ping";
 dotenv.config();
 const PORT = process.env.PORT || 8000;
 const prismaClient = new PrismaClient();
@@ -159,5 +160,6 @@ app.use("/api/v1/analytics", analytics);
 
 app.listen(PORT, () => {
 
+  setInterval(pingExternalServer, 30000);
   console.log("API server running at port " + PORT);
 });

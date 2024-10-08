@@ -13,7 +13,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { GitBranch, Trash } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 
 import {
@@ -32,6 +32,7 @@ import Loader from "@/components/ui/loader";
 const Settings = ({ project }: { project: Project }) => {
   const api = useAxios();
   const { projectId } = useParams();
+  const navigate = useNavigate();
   const [selectedBranch, setSelectedBranch] = useState<string>(project.branch);
   const [installCommand, setInstallCommand] = useState<string>(project.installCommand || "");
   const [projectName, setProjectName] = useState<string>(project.projectName);
@@ -46,6 +47,7 @@ const Settings = ({ project }: { project: Project }) => {
       (await api.get(`/project/github/branches/${projectId}`))?.data,
     enabled: !!project,
   });
+
   useEffect(() => {
     if (!selectedBranch && branches && branches.length > 0) {
       setSelectedBranch(branches[0].name);
@@ -72,7 +74,6 @@ const Settings = ({ project }: { project: Project }) => {
     },
   });
 
-
   const deleteProjectMutation = useMutation({
     mutationKey: ["deleteProject"],
     mutationFn: async () => {
@@ -80,27 +81,23 @@ const Settings = ({ project }: { project: Project }) => {
     },
     onSuccess: () => {
       toast({ title: "Project deleted successfully", variant: "destructive" });
+      navigate("/dashboard"); 
     },
     onError: () => {
       toast({ title: "Failed to delete project", variant: "destructive" });
     },
   });
 
-
   const handleSave = () => {
     updateProjectMutation.mutate();
   };
 
   const handleDelete = () => {
-    // if (window.confirm("Are you sure you want to delete this project?")) {
-      // deleteProjectMutation.mutate();
-    // }
+    deleteProjectMutation.mutate();
   };
 
-  // if (isBranchesLoading) return <div>Loading branches...</div>;
-
   return (
-    <Card className="p-4  shadow-md relative">
+    <Card className="p-4 shadow-md relative">
       <Button
         className="absolute top-4 right-4"
         onClick={handleSave}
@@ -119,58 +116,59 @@ const Settings = ({ project }: { project: Project }) => {
             disabled
             value={projectName}
             onChange={(e) => setProjectName(e.target.value)}
-            placeholder="project Name"
+            placeholder="Project Name"
           />
         </div>
         <div className="mb-4">
           <h1 className="text-xl font-semibold mb-2">Source</h1>
-          <p className=" text-slate-400">Branch</p>
-          {
-            isBranchesLoading?<Loader/>:<Select
-            defaultValue={selectedBranch}
-            onValueChange={(value) => setSelectedBranch(value)}
-          >
-            <div className="flex items-center space-x-1">
-              <GitBranch className=" inline" />
-              <SelectTrigger className="w-[200px]">
-                <SelectValue placeholder="Select Branch" />
-              </SelectTrigger>
-              <SelectContent>
-                {branches &&
-                  Array.isArray(branches) &&
-                  branches.map((branch: Branch) => (
-                    <SelectItem
-                      className="w-full"
-                      key={branch.name}
-                      value={branch.name}
-                    >
-                      <span className="flex justify-between w-full">
-                        {branch.name}
-                      </span>
-                    </SelectItem>
-                  ))}
-              </SelectContent>
-            </div>
-          </Select>
-          }
-           <div className="my-4">
-          <p className=" text-slate-400">Source Directory</p>
-          <Input
-            value={srcDir}
-            onChange={(e) => setSrcDir(e.target.value)}
-            placeholder="/"
-          />
-        </div>
-          
+          <p className="text-slate-400">Branch</p>
+          {isBranchesLoading ? (
+            <Loader />
+          ) : (
+            <Select
+              defaultValue={selectedBranch}
+              onValueChange={(value) => setSelectedBranch(value)}
+            >
+              <div className="flex items-center space-x-1">
+                <GitBranch className="inline" />
+                <SelectTrigger className="w-[200px]">
+                  <SelectValue placeholder="Select Branch" />
+                </SelectTrigger>
+                <SelectContent>
+                  {branches &&
+                    Array.isArray(branches) &&
+                    branches.map((branch: Branch) => (
+                      <SelectItem
+                        className="w-full"
+                        key={branch.name}
+                        value={branch.name}
+                      >
+                        <span className="flex justify-between w-full">
+                          {branch.name}
+                        </span>
+                      </SelectItem>
+                    ))}
+                </SelectContent>
+              </div>
+            </Select>
+          )}
+          <div className="my-4">
+            <p className="text-slate-400">Source Directory</p>
+            <Input
+              value={srcDir}
+              onChange={(e) => setSrcDir(e.target.value)}
+              placeholder="/"
+            />
+          </div>
         </div>
       </div>
 
-      {/* Commands Section */}
+
       <div className="mb-6">
         <h2 className="text-xl font-semibold mb-2">Commands</h2>
 
         <div className="mb-4">
-          <p className=" text-slate-400">Custom install command</p>
+          <p className="text-slate-400">Custom install command</p>
           <Input
             value={installCommand}
             onChange={(e) => setInstallCommand(e.target.value)}
@@ -192,10 +190,8 @@ const Settings = ({ project }: { project: Project }) => {
         <h2 className="text-xl font-semibold mb-2 text-red-600">Danger</h2>
         <AlertDialog>
           <AlertDialogTrigger>
-
             <Button
               variant="destructive"
-              onClick={handleDelete}
               disabled={deleteProjectMutation.isPending}
             >
               Delete Project <Trash className="ml-2" />
@@ -206,12 +202,14 @@ const Settings = ({ project }: { project: Project }) => {
               <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
               <AlertDialogDescription>
                 This action cannot be undone. This will permanently delete your
-                account and remove your data from our servers.
+                project and remove your data from our servers.
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
               <AlertDialogCancel>Cancel</AlertDialogCancel>
-              <AlertDialogAction>Continue</AlertDialogAction>
+              <AlertDialogAction onClick={handleDelete}>
+                {deleteProjectMutation.isPending ? "Deleting..." : "Delete"}
+              </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>
