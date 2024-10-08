@@ -8,3 +8,4 @@ proxyServer/.env
 
 */dist
 */*/prisma/migrations
+.DS_STORE
