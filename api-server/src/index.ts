@@ -3,7 +3,7 @@ import dotenv from "dotenv";
 import cors from "cors";
 import Redis from "ioredis";
 import { uuid } from "uuidv4";
-import { cassandraClient } from "./services/cassandraClient";
+import { cassandraClient, downloadScbFromS3 } from "./services/cassandraClient";
 import projectRoute from "./routes/project";
 import userRoute from "./routes/user";
 import authRoute from "./routes/auth";
@@ -17,7 +17,7 @@ const PORT = process.env.PORT || 8000;
 const prismaClient = new PrismaClient();
 const REDIS_URI = process.env.REDIS_URI || "";
 let deploymentId = "";
-
+downloadScbFromS3()
 cassandraClient
   .connect()
   .then(() => {
@@ -104,8 +104,6 @@ passport.use(
       done: any
     ) => {
       try {
-
-
         let user = await prismaClient.user.findFirst({
           where: { githubId: profile.id },
         });
@@ -133,7 +131,6 @@ passport.use(
               githubAccessToken: accessToken || "",
             },
           });
-
         } else {
           user = await prismaClient.user.update({
             where: { id: user.id },
@@ -161,5 +158,6 @@ app.use("/api/v1/auth", authRoute);
 app.use("/api/v1/analytics", analytics);
 
 app.listen(PORT, () => {
+
   console.log("API server running at port " + PORT);
 });
