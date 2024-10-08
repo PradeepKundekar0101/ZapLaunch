@@ -19,9 +19,11 @@ app.use(async (req, res) => {
     const clientIP = req.ip;
 
     try {
-        await prismaClient.request.create({
-            data: { projectName: subdomain, ipAddress: clientIP }
-        });
+        if(subdomain!=="ping"){
+            await prismaClient.request.create({
+                data: { projectName: subdomain, ipAddress: clientIP }
+            });
+        }
     } catch (error) {
         console.error("Error creating request record:", error);
     }

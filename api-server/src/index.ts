@@ -24,16 +24,16 @@ async function initializeCassandra() {
   try {
     await downloadScbFromS3();
     console.log("SCB download completed.");
-    
+
     await cassandraClient.connect();
     console.log("Cassandra Client connected Successfully!");
     
     await cassandraClient.execute(`
       CREATE TABLE IF NOT EXISTS default_keyspace.Logs (
         event_id UUID,
-        deploymentId UUID,
-        log text,
-        timestamp timestamp,
+        deployment_id TEXT,
+        log TEXT,
+        timestamp TIMESTAMP,
         PRIMARY KEY (event_id)
       );
     `);
@@ -55,8 +55,9 @@ async function initializeRedis() {
       deploymentId = channel.split(":")[1];
       try {
         await cassandraClient.execute(
-          `INSERT INTO default_keyspace.Logs (event_id, deploymentId, log, timestamp) VALUES (?, ?, ?, toTimestamp(now()));`,
-          [uuid(), deploymentId, message]
+          `INSERT INTO default_keyspace.Logs (event_id, deployment_id, log, timestamp) VALUES (?, ?, ?, toTimestamp(now()));`,
+          [uuid(), deploymentId, message],
+          { prepare: true }
         );
         console.log("Inserted in Logs DB");
       } catch (error) {
