@@ -14,7 +14,7 @@ const AuthCallback = () => {
     queryKey: ["userDetails", token],
     queryFn: async () => {
       if (!token) throw new Error("No token provided");
-      const response = await axios.get("http://localhost:8000/api/v1/user/details", {
+      const response = await axios.get( import.meta.env.VITE_BASE_URL+"/api/v1/user/details", {
         headers: { Authorization: `Bearer ${token}` }
       });
       return response.data;
