@@ -37,7 +37,9 @@ const Navbar = () => {
   }, [token]);
 
   const handleGithubLogin = () => {
-    window.location.href = "http://localhost:8000/api/v1/auth/github";
+    console.log(import.meta.env.VITE_BASE_URL)
+    
+    window.location.href = import.meta.env.VITE_BASE_URL+"/api/v1/auth/github";
   };
 
   const handleLogout = () => {
