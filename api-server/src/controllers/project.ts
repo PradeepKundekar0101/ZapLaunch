@@ -291,37 +291,47 @@ export const checkProjectExists = asyncHandler(
 
 export const getLogs = asyncHandler(async (req: AuthRequest, res: Response) => {
   const deployId = req.params.deployId;
+
+  // Validate deployId
+  if (!deployId || typeof deployId !== 'string') {
+    throw new ApiError(400, "Invalid deployment ID");
+  }
+
   const deployment = await prismaClient.deployment.findUnique({
     where: {
       id: deployId,
     },
   });
+
   if (!deployment) {
     throw new ApiError(404, "Deployment does not exist");
   }
+
   try {
     const result = await cassandraClient.execute(
       `
-          SELECT * FROM default_keyspace.Logs WHERE deployment_id = ? ALLOW FILTERING;
+      SELECT * FROM default_keyspace.Logs WHERE deployment_id = ? ALLOW FILTERING;
       `,
-      [deployId]
+      [deployId],
+      { prepare: true }
     );
-    const logs = result.rows.map((row) => {
-      return { log: row.log, timestamp: row.timestamp };
-    });
-    res
-      .status(200)
-      .json(
-        new ApiResponse(
-          200,
-          "Logs retrieved successfully",
-          { deploymentStatus: deployment.status, logs },
-          true
-        )
-      );
+
+    const logs = result.rows.map((row) => ({
+      log: row.log,
+      timestamp: row.timestamp
+    }));
+
+    res.status(200).json(
+      new ApiResponse(
+        200,
+        "Logs retrieved successfully",
+        { deploymentStatus: deployment.status, logs },
+        true
+      )
+    );
   } catch (error: any) {
-    console.error("Error retrieving logs:", error.message);
-    throw new ApiError(500, "Internal Server Error");
+    console.error("Error retrieving logs:", error);
+    throw new ApiError(500, `Internal Server Error: ${error.message}`);
   }
 });
 
@@ -468,6 +478,7 @@ export const deleteProject = asyncHandler(
     const bucketName = process.env.AWS_BUCKET_NAME!;
     const s3Key = `/outputs/${existingProject.projectName}`;
     await deleteS3Folder(bucketName, s3Key);
+    await prismaClient.deployment.deleteMany({where:{projectId}})
     await prismaClient.request.deleteMany({where:{projectName:existingProject.projectName}});
     await prismaClient.project.delete({where:{id:projectId}});
 

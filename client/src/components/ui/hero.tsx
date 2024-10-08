@@ -2,8 +2,13 @@
 import { Badge } from '@/components/ui/badge';
 import { ArrowRight, PlayCircleIcon } from 'lucide-react';
 import { motion } from "framer-motion";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from './dialog';
+import { DialogDescription } from '@radix-ui/react-dialog';
+import { useNavigate } from 'react-router-dom';
 
 const Hero = () => {
+  const videoKey = import.meta.env.VITE_DEMO_KEY
+  const navigate = useNavigate();
   return (
     <div>
       <section className="flex items-start flex-col justify-center relative text-center h-full py-10 ">
@@ -51,16 +56,34 @@ const Hero = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.6 }}
         >
+          <Dialog>
+    <DialogTrigger>
+
           <motion.button 
             className="text-white border-white border rounded-md px-10 py-1 text-xl flex items-center duration-500"
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             
-          >
+            >
             <span className="mr-1 text-lg font-thin">Watch Demo</span>
             <PlayCircleIcon />
           </motion.button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>
+                    Watch demo
+                  </DialogTitle>
+                </DialogHeader>
+                <DialogDescription>
+                {videoKey?<iframe className=' w-full' height="315" src={`https://www.youtube.com/embed/${videoKey}`} title="YouTube video player" frameBorder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerPolicy="strict-origin-when-cross-origin" allowFullScreen></iframe>:<h1>Coming soon...</h1>}
+                  </DialogDescription>
+              </DialogContent>
+            </Dialog>
           <motion.button 
+          onClick={()=>{
+            navigate("/dashboard")
+          }}
             className="bg-white text-black rounded-md px-10 py-1 text-xl flex items-center duration-500"
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}

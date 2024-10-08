@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import Navbar from "@/components/ui/navbar";
 import { Footer } from "@/components/ui/footer";
@@ -9,6 +9,7 @@ type Props = {
 };
 
 function DefaultLayout({ children }: Props) {
+  useEffect(()=>{},[window.location.pathname])
   return (
     <motion.main
       className="flex flex-col min-h-screen overflow-hidden"
@@ -40,7 +41,7 @@ function DefaultLayout({ children }: Props) {
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.5, delay: 0.4 }}
       >
-        {window.location.pathname == "/" && <Footer />}
+        {window.location.pathname == ""  || window.location.pathname == "/" && <Footer />}
       </motion.div>
     </motion.main>
   );
