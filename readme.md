@@ -1,5 +1,8 @@
 # ZapLaunch
 ![Screenshot 2024-10-08 at 4 15 21 PM](https://github.com/user-attachments/assets/2165fafa-6a06-4136-ac64-f146744e588a)
+
+![image](https://github.com/user-attachments/assets/a7b693bc-7343-4ef7-aee4-57249f97a377)
+
 **ZapLaunch** is a full-stack web application designed to automate the deployment of GitHub repositories. Users can log in via GitHub, configure build settings, and deploy projects effortlessly using AWS infrastructure. ZapLaunch provides real-time feedback on build logs and serves the deployed application via AWS CloudFront.
 
 ## About
