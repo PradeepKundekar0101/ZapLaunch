@@ -27,9 +27,9 @@ async function initializeCassandra() {
 
     await cassandraClient.connect();
     console.log("Cassandra Client connected Successfully!");
-    
+
     await cassandraClient.execute(`
-      CREATE TABLE IF NOT EXISTS default_keyspace.Logs (
+      CREATE TABLE IF NOT EXISTS buildio.Logs (
         event_id UUID,
         deployment_id TEXT,
         log TEXT,
@@ -46,16 +46,16 @@ async function initializeCassandra() {
 
 async function initializeRedis() {
   const subscriber = new Redis(REDIS_URI);
-  
+
   try {
     await subscriber.psubscribe("logs:*");
     console.log("Redis subscribed to Logs Channel");
-    
+
     subscriber.on("pmessage", async (pattern, channel, message) => {
       deploymentId = channel.split(":")[1];
       try {
         await cassandraClient.execute(
-          `INSERT INTO default_keyspace.Logs (event_id, deployment_id, log, timestamp) VALUES (?, ?, ?, toTimestamp(now()));`,
+          `INSERT INTO buildio.Logs (event_id, deployment_id, log, timestamp) VALUES (?, ?, ?, toTimestamp(now()));`,
           [uuid(), deploymentId, message],
           { prepare: true }
         );

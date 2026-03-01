@@ -16,7 +16,7 @@ router.get("/guestLogin", async (req, res) => {
     }
 
     const token = generateToken(guestUser);
-    res.json({guestUser, token });
+    res.json({ guestUser, token });
   } catch (error) {
     console.error("Error in guest login:", error);
     res.status(500).json({ error: "Internal server error" });
@@ -29,8 +29,8 @@ router.get(
   passport.authenticate("github", { session: true }),
   (req, res) => {
     const token = generateToken(req.user);
-    res.redirect(`https://zaplaunch.tech/auth-callback?token=${token}`);
     // res.redirect(`http://localhost:5173/auth-callback?token=${token}`);
+    res.redirect(`https://getbuild.io/auth-callback?token=${token}`);
   }
 );
 router.get('/signout', (req, res) => {

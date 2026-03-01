@@ -33,9 +33,9 @@ export const createProject = asyncHandler(
     const [owner, repo] = gitUrl.replace("https://github.com/", "").split("/");
 
     const user = await prismaClient.user.findFirst({ where: { id: userId } });
-    if (!user) 
+    if (!user)
       throw new ApiError(404, "User not found");
-    let defaultBranch=""
+    let defaultBranch = ""
     try {
       const repoResponse = await axios.get(
         `https://api.github.com/repos/${owner}/${repo}`,
@@ -57,7 +57,7 @@ export const createProject = asyncHandler(
         gitUrl,
         userId,
         branch: defaultBranch,
-        env:""
+        env: ""
       },
     });
     res
@@ -74,18 +74,18 @@ export const createProject = asyncHandler(
 );
 export const updateProject = asyncHandler(
   async (req: AuthRequest, res: Response) => {
-    const {  buildCommand, installCommand,projectId,branch,srcDir } =
+    const { buildCommand, installCommand, projectId, branch, srcDir } =
       req.body;
     const existingProject = await prismaClient.project.findFirst({
       where: {
-        id:projectId,
+        id: projectId,
       },
     });
-    if (existingProject && existingProject?.id!==projectId) {
+    if (existingProject && existingProject?.id !== projectId) {
       throw new ApiError(409, "Project Name already taken");
     }
     const updatedProject = await prismaClient.project.update({
-      where:{id:projectId},data:{buildCommand,installCommand,branch,lastModified:new Date(),srcDir}
+      where: { id: projectId }, data: { buildCommand, installCommand, branch, lastModified: new Date(), srcDir }
     })
     res
       .status(200)
@@ -101,11 +101,11 @@ export const updateProject = asyncHandler(
 );
 export const updateEnvFields = asyncHandler(
   async (req: AuthRequest, res: Response) => {
-    const { env,projectId} =
+    const { env, projectId } =
       req.body;
     console.log(projectId)
     const updatedProject = await prismaClient.project.update({
-      where:{id:projectId},data:{env}
+      where: { id: projectId }, data: { env }
     })
     res
       .status(200)
@@ -172,12 +172,12 @@ export const deployProject = asyncHandler(
         gitUrl: project.gitUrl,
         projectName: project.projectName,
         deploymentId: deployment.id,
-        env:project.env,
-        branch:project.branch,
-        installCommand:project.installCommand,
-        buildCommand:project.buildCommand,
+        env: project.env,
+        branch: project.branch,
+        installCommand: project.installCommand,
+        buildCommand: project.buildCommand,
         token,
-        srcDir:project.srcDir
+        srcDir: project.srcDir
       }),
       QueueUrl: process.env.AWS_SQS_URL!,
     };
@@ -187,10 +187,10 @@ export const deployProject = asyncHandler(
         console.log("Error", err);
       } else {
         console.log("Successfully added message", data.MessageId);
-    }
+      }
     });
     await prismaClient.project.update({
-      where:{id:projectId},data:{lastDeployed:new Date()}
+      where: { id: projectId }, data: { lastDeployed: new Date() }
     })
 
     res.json({
@@ -199,7 +199,7 @@ export const deployProject = asyncHandler(
         title: latestCommitMessage,
         projectId,
         status: "QUEUED",
-        url: `http://${project.projectName}.localhost:3000`, // Example project URL
+        url: `http://${project.projectName}.localhost:3000`,
         id: deployment.id,
       },
     });
@@ -310,7 +310,7 @@ export const getLogs = asyncHandler(async (req: AuthRequest, res: Response) => {
   try {
     const result = await cassandraClient.execute(
       `
-      SELECT * FROM default_keyspace.Logs WHERE deployment_id = ? ALLOW FILTERING;
+      SELECT * FROM buildio.Logs WHERE deployment_id = ? ALLOW FILTERING;
       `,
       [deployId],
       { prepare: true }
@@ -422,7 +422,7 @@ export const getBranches = asyncHandler(
             Accept: "application/vnd.github.v3+json",
           },
           params: {
-            per_page: 100, 
+            per_page: 100,
           },
         }
       );
@@ -431,7 +431,7 @@ export const getBranches = asyncHandler(
         name: branch.name,
         commitSha: branch.commit.sha,
         protected: branch.protected,
-        isDefault: branch.name === defaultBranch, 
+        isDefault: branch.name === defaultBranch,
       }));
 
       res.status(200).json(branches);
@@ -445,11 +445,11 @@ export const getBranches = asyncHandler(
 export const updateIsLive = asyncHandler(
   async (req: AuthRequest, res: Response) => {
     const projectId = req.params.projectId;
-    const {  isLive } = req.body;
+    const { isLive } = req.body;
     console.log(projectId)
     console.log(isLive)
     const updatedProject = await prismaClient.project.updateMany({
-      where:{projectName:projectId},data:{isLive}
+      where: { projectName: projectId }, data: { isLive }
     })
     res
       .status(200)
@@ -469,7 +469,7 @@ export const deleteProject = asyncHandler(
     const projectId = req.params.projectId;
     const existingProject = await prismaClient.project.findFirst({
       where: {
-        id:projectId,
+        id: projectId,
       },
     });
     if (!existingProject) {
@@ -478,9 +478,9 @@ export const deleteProject = asyncHandler(
     const bucketName = process.env.AWS_BUCKET_NAME!;
     const s3Key = `/outputs/${existingProject.projectName}`;
     await deleteS3Folder(bucketName, s3Key);
-    await prismaClient.deployment.deleteMany({where:{projectId}})
-    await prismaClient.request.deleteMany({where:{projectName:existingProject.projectName}});
-    await prismaClient.project.delete({where:{id:projectId}});
+    await prismaClient.deployment.deleteMany({ where: { projectId } })
+    await prismaClient.request.deleteMany({ where: { projectName: existingProject.projectName } });
+    await prismaClient.project.delete({ where: { id: projectId } });
 
     res
       .status(200)

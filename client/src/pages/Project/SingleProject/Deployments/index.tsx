@@ -111,9 +111,9 @@ const Deployments = ({
               oldData?.map((deployment: Deployment) =>
                 deployment.id === deploymentId
                   ? {
-                      ...deployment,
-                      status: updatedDeployment.deploymentStatus,
-                    }
+                    ...deployment,
+                    status: updatedDeployment.deploymentStatus,
+                  }
                   : deployment
               ) || []
           );
@@ -180,10 +180,10 @@ const Deployments = ({
 
   return (
     <Card className="relative overflow-hidden">
-       <div className="blob absolute h-96 w-96 bg-green-600 blur-3xl opacity-10 top-0 left-10"></div>
-       <div className="blob absolute h-96 w-96 bg-blue-600 blur-3xl opacity-10 bottom-0 right-10"></div>
+      <div className="blob absolute h-96 w-96 bg-green-600 blur-3xl opacity-10 top-0 left-10"></div>
+      <div className="blob absolute h-96 w-96 bg-blue-600 blur-3xl opacity-10 bottom-0 right-10"></div>
       <div className=" text-white p-4 rounded-lg relative ">
-        { moment(project.lastModified).isAfter(moment(project.lastDeployed)) && <Alert className="">
+        {moment(project.lastModified).isAfter(moment(project.lastDeployed)) && <Alert className="">
           <Info className="h-4 w-4" />
           <AlertTitle>Changes detected</AlertTitle>
           <AlertDescription>
@@ -193,10 +193,10 @@ const Deployments = ({
         <div className="flex justify-between items-center mb-4 mt-4">
           <div className="flex flex-col">
 
-          <h2 className="text-xl font-semibold">
-            Deployments
+            <h2 className="text-xl font-semibold">
+              Deployments
             </h2>
-        
+
           </div>
           <div>
             {!isLoading && deployments?.length > 0 && (
@@ -220,9 +220,9 @@ const Deployments = ({
             <a className="" href={project.gitUrl}>
               {project.gitUrl.split("/").pop()}
             </a>
-           { deployments && deployments?.length>0 && <a className="text-sm flex items-center" target="_blank" href={`https://${project.projectName}.zaplaunch.tech`}><span className={`flex items-center ${currentDeploymentStatus=="DEPLOYED" || deployments?.length>0 && deployments[0].status==="DEPLOYED"&& "text-green-400"}`}>
-             
-              <ExternalLinkIcon className={`mr-1 `} size={16}/>  Visit site </span>  </a>}
+            {deployments && deployments?.length > 0 && <a className="text-sm flex items-center" target="_blank" href={`https://${project.projectName}.zaplaunch.tech`}><span className={`flex items-center ${currentDeploymentStatus == "DEPLOYED" || deployments?.length > 0 && deployments[0].status === "DEPLOYED" && "text-green-400"}`}>
+
+              <ExternalLinkIcon className={`mr-1 `} size={16} />  Visit site </span>  </a>}
           </div>
         </div>
 
@@ -246,15 +246,15 @@ const Deployments = ({
             )}
 
             {
-              deployments && deployments.length>0 && <>
-              <h1 className=" my-2">Current Deployment</h1>
-               <DeploymentCard deployment={deployments[0]} handleViewLogs={handleViewLogs}/>
+              deployments && deployments.length > 0 && <>
+                <h1 className=" my-2">Current Deployment</h1>
+                <DeploymentCard deployment={deployments[0]} handleViewLogs={handleViewLogs} />
               </>
             }
-           
-            {deployments && Array.isArray(deployments) && deployments.length>1 && <h1 className="my-2">Past Deployments</h1>}
-            {deployments?.map((deployment: Deployment,ind:number) => ( ind>0 && <>
-            <DeploymentCard deployment={deployment} handleViewLogs={handleViewLogs}/>
+
+            {deployments && Array.isArray(deployments) && deployments.length > 1 && <h1 className="my-2">Past Deployments</h1>}
+            {deployments?.map((deployment: Deployment, ind: number) => (ind > 0 && <>
+              <DeploymentCard deployment={deployment} handleViewLogs={handleViewLogs} />
             </>
             ))}
           </div>

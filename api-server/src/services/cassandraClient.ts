@@ -8,15 +8,15 @@ import path from 'path';
 import cassandra from 'cassandra-driver';
 
 const s3 = new AWS.S3({
-  accessKeyId: process.env.AWS_ACCESS_KEY,  
+  accessKeyId: process.env.AWS_ACCESS_KEY,
   secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
-  region: process.env.AWS_REGION,              
+  region: process.env.AWS_REGION,
 });
 
 const scbLocalPath = path.join(__dirname, 'scb.zip');
 
-const scbS3Bucket = process.env.AWS_BUCKET_NAME!; 
-const scbS3Key = "secure-connect-zaplaunch.zip";    
+const scbS3Bucket = process.env.AWS_BUCKET_NAME!;
+const scbS3Key = "secure-connect-getbuildio.zip";
 
 export const downloadScbFromS3 = async () => {
   const params = {
@@ -35,6 +35,6 @@ export const downloadScbFromS3 = async () => {
   }
 };
 
-const cloud = { secureConnectBundle: path.join(__dirname,"scb.zip") };
+const cloud = { secureConnectBundle: path.join(__dirname, "scb.zip") };
 const authProvider = new cassandra.auth.PlainTextAuthProvider('token', process.env['ASTRA_DB_APPLICATION_TOKEN']!);
 export const cassandraClient = new cassandra.Client({ cloud, authProvider });
