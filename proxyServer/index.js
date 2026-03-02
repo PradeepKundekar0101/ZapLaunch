@@ -17,7 +17,7 @@ app.use(async (req, res) => {
     const subdomain = hostname.split('.')[0];
     const resolvesTo = `${CDN_URL}/outputs/${subdomain}/`;
     const clientIP = req.ip;
-
+    console.log("HELLo")
     try {
         if (subdomain === 'getbuild' || subdomain === 'www') {
             return res.redirect('https://www.getbuild.io');
