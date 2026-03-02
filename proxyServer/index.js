@@ -19,10 +19,16 @@ app.use(async (req, res) => {
     const clientIP = req.ip;
 
     try {
+        if (subdomain === 'getbuild' || subdomain === 'www') {
+            return res.redirect('https://www.getbuild.io');
+        }
         if(subdomain!=="ping"){
             await prismaClient.request.create({
                 data: { projectName: subdomain, ipAddress: clientIP }
             });
+        }
+        if(subdomain==="proxy"){
+            res.send("Proxy server is running")
         }
     } catch (error) {
         console.error("Error creating request record:", error);

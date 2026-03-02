@@ -1,0 +1,12 @@
+{
+  "unknown": {
+    "versionFramework": "4.33.0",
+    "command": [],
+    "options": {},
+    "serviceProviderAwsCfStackId": null,
+    "serviceProviderAwsCfStackCreated": null,
+    "serviceProviderAwsCfStackUpdated": null,
+    "serviceProviderAwsCfStackStatus": null,
+    "serviceProviderAwsCfStackOutputs": null
+  }
+}

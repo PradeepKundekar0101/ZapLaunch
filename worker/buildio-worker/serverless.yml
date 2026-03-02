@@ -1,0 +1,51 @@
+org: pradeepkundekar
+app: buildio
+service: buildio-worker
+useDotenv: true
+
+provider:
+  name: aws
+  runtime: nodejs20.x
+  region: ap-south-1
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - ecs:RunTask
+          Resource:
+            - ${env:ECS_TASK_ARN}
+            - arn:aws:ecs:${self:provider.region}:${aws:accountId}:task-definition/*
+        - Effect: Allow
+          Action:
+            - iam:PassRole
+          Resource: "*"
+        - Effect: Allow
+          Action:
+            - sqs:ReceiveMessage
+            - sqs:DeleteMessage
+            - sqs:GetQueueAttributes
+          Resource: ${env:AWS_SQS_ARN}
+  environment:
+    ECS_CLUSTER_NAME: ${env:ECS_CLUSTER_NAME}
+    ECS_TASK_ARN: ${env:ECS_TASK_ARN}
+    ECS_SUBNET1: ${env:ECS_SUBNET1}
+    ECS_SUBNET2: ${env:ECS_SUBNET2}
+    ECS_SUBNET3: ${env:ECS_SUBNET3}
+    ECS_SECURITY_GROUP: ${env:ECS_SECURITY_GROUP}
+    ECS_CONTAINER_NAME: ${env:ECS_CONTAINER_NAME}
+    MY_AWS_ACCESS_KEY: ${env:AWS_ACCESS_KEY}
+    MY_AWS_REGION: ${self:provider.region}
+    MY_AWS_SECRET_ACCESS_KEY: ${env:AWS_SECRET_ACCESS_KEY}
+    MY_AWS_BUCKET_NAME: ${env:AWS_BUCKET_NAME}
+    REDIS_URI: ${env:REDIS_URI}
+    API_SERVER_URL: ${env:API_SERVER_URL}
+
+functions:
+  runBuildTask:
+    handler: handler.runBuildTask
+    timeout: 30
+    events:
+      - sqs:
+          arn: ${env:AWS_SQS_ARN}
+          batchSize: 1

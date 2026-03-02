@@ -1,4 +1,3 @@
-const { exec } = require("child_process");
 const path = require("path");
 const fs = require("fs");
 const mimetypes = require("mime-types");
@@ -21,7 +20,9 @@ const DEPLOYMENT_ID = process.env.DEPLOYMENT_ID;
 const JWT_TOKEN = process.env.JWT_TOKEN;
 const SRC_DIR = process.env.SRC_DIR;
 const GIT_REPO_URL = process.env.GIT_REPO_URL;
-
+const region = process.env.AWS_REGION || 'ap-south-1'
+const accessKeyId=process.env.AWS_ACCESS_KEY
+const secretAccessKey = process.env.AWS_SECRET_ACCESS_KEY
 const publisher = new Redis(REDIS_URI);
 
 const publishLog = (log) => {
@@ -62,11 +63,12 @@ const updateDeploymentStatus = async (status, isLive = false) => {
 };
 
 const s3client = new S3Client({
-  region: process.env.AWS_REGION,
+  region,
   credentials: {
-    accessKeyId: process.env.AWS_ACCESS_KEY,
-    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+    accessKeyId,
+    secretAccessKey
   },
+  followRegionRedirects: true,
 });
 
 function createEnvFile(outdirpath) {
