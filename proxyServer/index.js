@@ -8,9 +8,10 @@ const { PrismaClient } = require("@prisma/client");
 const app = express();
 const PORT = process.env.PORT || 3000;
 const CDN_URL = process.env.AWS_CDN_URL || "";
-const proxy = httpProxy.createProxy();
+const proxy = httpProxy.createProxy({ proxyTimeout: 10000, timeout: 10000 });
 const prismaClient = new PrismaClient();
 
+console.log("CDN_URL:", CDN_URL ? CDN_URL : "*** NOT SET ***");
 
 app.get("/health", (req, res) => {
     res.status(200).send("OK");
@@ -21,6 +22,9 @@ app.use(async (req, res) => {
     const subdomain = hostname.split('.')[0];
     const resolvesTo = `${CDN_URL}/outputs/${subdomain}/`;
     const clientIP = req.ip;
+
+    console.log(`Request: ${hostname} -> subdomain: ${subdomain} -> target: ${resolvesTo}`);
+
     try {
         if (subdomain === 'getbuild' || subdomain === 'www') {
             return res.redirect('https://www.getbuild.io');
@@ -55,6 +59,13 @@ proxy.on("proxyReq", (proxyReq, req, res) => {
     }
 });
 
+proxy.on("error", (err, req, res) => {
+    console.error("Proxy error:", err.message, "| Target:", req.url);
+    if (!res.headersSent) {
+        res.status(502).send("Bad Gateway");
+    }
+});
+
 app.listen(PORT, () => {
-    console.log("Server running atTTT PORT " + PORT);
+    console.log("Server running on PORT " + PORT);
 });
