@@ -12,12 +12,15 @@ const proxy = httpProxy.createProxy();
 const prismaClient = new PrismaClient();
 
 
+app.get("/health", (req, res) => {
+    res.status(200).send("OK");
+});
+
 app.use(async (req, res) => {
     const hostname = req.hostname;
     const subdomain = hostname.split('.')[0];
     const resolvesTo = `${CDN_URL}/outputs/${subdomain}/`;
     const clientIP = req.ip;
-    console.log("HELLo")
     try {
         if (subdomain === 'getbuild' || subdomain === 'www') {
             return res.redirect('https://www.getbuild.io');
