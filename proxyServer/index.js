@@ -28,10 +28,11 @@ app.use(async (req, res) => {
             });
         }
         if(subdomain==="proxy"){
-            res.send("Proxy server is running")
+            return res.send("Proxy server is running")
         }
     } catch (error) {
         console.error("Error creating request record:", error);
+        return res.status(500).send("Internal Server Error");
     }
 
     proxy.web(req, res, {
